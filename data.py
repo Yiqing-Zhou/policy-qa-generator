@@ -3,7 +3,7 @@ import config
 import re
 
 def replace_span(pattern, index, repl, string):
-    m = re.match(pattern, string)
+    m = re.search(pattern, string)
     if m is None:
         return string
     s = m.span(index)
@@ -19,8 +19,9 @@ class PolicyDoc(object):
 
     def process_chars(self, content):
         r = content
-        r = replace_span('.*([ ]+)第.+[章|条].*', 1, '\n', r)
+        r = r.replace(',', '，')
         r = re.sub('[\xa0|\ue003|\ue004|\u3000]+', '\n', r)
+        r = replace_span(r'(\s+)第.+[章|条]', 1, '\n', r)
         r = re.sub('总[ ]+则', '总则', r)
         return r
 
