@@ -11,9 +11,10 @@ def replace_span(pattern, index, repl, string):
 
 
 class PolicyDoc(object):
-    def __init__(self, url, title, content):
+    def __init__(self, url, title, publishDate, content):
         self.url = url
         self.title = title
+        self.publishDate = publishDate.strip()
         self.content = self.process_chars(content)
 
 
@@ -30,6 +31,6 @@ def load_documents():
     samples = utils.load_json(config.data_file)
     docs = []
     for sample in samples:
-        doc = PolicyDoc(sample['url'], sample['title'], sample['content'])
+        doc = PolicyDoc(sample['url'], sample['title'], sample['publishDate'], sample['content'])
         docs.append(doc)
     return docs

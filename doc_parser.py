@@ -13,6 +13,8 @@ def classify_paragraph(paragraph):
         return 'definition'
     elif re.match('.+按照.+分为.+', paragraph) is not None:
         return 'classification'
+    elif re.match('.+自.+起.+', paragraph) is not None:
+        return 'schedule'
     else:
         return 'unknown'
 

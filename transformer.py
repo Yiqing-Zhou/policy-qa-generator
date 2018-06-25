@@ -40,17 +40,32 @@ def transform_classification(paragraph):
     return question, answer
 
 
+'''
+本公告自发布后30日起施行。此前尚未处理的涉税事项按本公告执行。
+q:关于个人投资者收购企业股权后将原盈余积累转增股本个人所得税问题的公告自何时起施行
+a:自发布（2013-05-14）后30日起施行。此前尚未处理的涉税事项按本公告执行。
+'''
+def transform_schedule(paragraph):
+    m = re.search('(.*)自(.*)日起(.*?)[，|。|；]', paragraph)
+    subj = m.span(1)
+    verb = m.span(3)
+    question = paragraph[subj[0]:subj[1]] + '自何时起' + paragraph[verb[0]:verb[1]]
+    answer = paragraph[subj[1]:]
+    return question, answer
+
 def transform_doc(doc):
     doc.qas = []
     transformers = {
         'definition': transform_definition,
-        'classification': transform_classification
+        'classification': transform_classification,
+        'schedule': transform_schedule
     }
     for type, paragraphs in doc.classified_paragraphs.items():
         if type != 'unknown':
             for paragraph in paragraphs:
                 question, answer = transformers[type](paragraph)
                 question = normalize(doc, question)
+                answer = normalize(doc, answer)
                 doc.qas.append(QuestionAnswer(type, question, answer))
 
 
@@ -71,10 +86,21 @@ def remove_punction(text):
 
 
 def substitute_pronoun(text, title):
-    prefix = ['本规定', '本通知', '本公告', '本条']
+    prefix = ['本规定', '本通知', '本公告', '本条', '本补充公告']
     for p in prefix:
         if text.startswith(p):
             return title + text[len(p):]
+    return text
+
+
+def substitute_publishDate(text, publishDate):
+    refer = ['公告之日', '发布之日', '公告后', '发布后']
+    for r in refer:
+        if r in text:
+            m = re.search('(公告|发布).*', text)
+            publ = m.span(1)
+            text = text[:publ[1]] + '（{0}）' + text[publ[1]:]
+            return text.format(publishDate)
     return text
 
 
@@ -82,4 +108,5 @@ def normalize(doc, text):
     text = remove_bullet(text)
     text = remove_punction(text)
     text = substitute_pronoun(text, doc.title)
+    text = substitute_publishDate(text, doc.publishDate)
     return text
