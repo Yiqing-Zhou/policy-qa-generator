@@ -15,6 +15,8 @@ def classify_paragraph(paragraph):
         return 'classification'
     elif re.match('.*本.+自.+起.+', paragraph) is not None:
         return 'schedule'
+    elif re.match('.+在.+时，应.+', paragraph) is not None:
+        return 'instruction'
     else:
         return 'unknown'
 

@@ -53,12 +53,27 @@ def transform_schedule(paragraph):
     answer = paragraph[subj[1]:]
     return question, answer
 
+'''
+二、境内机构和个人（以下称备案人）在办理对外支付税务备案时，应向主管国税机关提交加盖公章的合同（协议）或相关交易凭证复印件（外文文本应同时附送中文译本），并填报《服务贸易等项目对外支付税务备案表》（一式三份，以下简称《备案表》，见附件1）。
+q:境内机构和个人（以下称备案人）怎样办理对外支付税务备案
+a:向主管国税机关提交加盖公章的合同（协议）或相关交易凭证复印件（外文文本应同时附送中文译本）并填报服务贸易等项目对外支付税务备案表（一式三份以下简称备案表见附件1）。
+'''
+def transform_instruction(paragraph):
+    m = re.search('(.*)在(.*)时，应(.*)', paragraph)
+    subj = m.span(1)
+    acti = m.span(2)
+    inst = m.span(3)
+    question = paragraph[subj[0]:subj[1]] + '怎样' + paragraph[acti[0]:acti[1]]
+    answer = paragraph[inst[0]:]
+    return question, answer
+
 def transform_doc(doc):
     doc.qas = []
     transformers = {
         'definition': transform_definition,
         'classification': transform_classification,
-        'schedule': transform_schedule
+        'schedule': transform_schedule,
+        'instruction': transform_instruction
     }
     for type, paragraphs in doc.classified_paragraphs.items():
         if type != 'unknown':
