@@ -46,7 +46,7 @@ q:关于个人投资者收购企业股权后将原盈余积累转增股本个人
 a:自发布（2013-05-14）后30日起施行。此前尚未处理的涉税事项按本公告执行。
 '''
 def transform_schedule(paragraph):
-    m = re.search('(.*)自(.*)日起(.*?)[，|。|；]', paragraph)
+    m = re.search('(本.+)自(.*)起(.*?)[，|。|；]', paragraph)
     subj = m.span(1)
     verb = m.span(3)
     question = paragraph[subj[0]:subj[1]] + '自何时起' + paragraph[verb[0]:verb[1]]
