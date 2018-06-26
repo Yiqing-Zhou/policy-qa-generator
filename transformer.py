@@ -53,6 +53,7 @@ def transform_schedule(paragraph):
     answer = paragraph[subj[1]:]
     return question, answer
 
+
 '''
 二、境内机构和个人（以下称备案人）在办理对外支付税务备案时，应向主管国税机关提交加盖公章的合同（协议）或相关交易凭证复印件（外文文本应同时附送中文译本），并填报《服务贸易等项目对外支付税务备案表》（一式三份，以下简称《备案表》，见附件1）。
 q:境内机构和个人（以下称备案人）在办理对外支付税务备案时应时应如何
@@ -65,13 +66,30 @@ def transform_instruction(paragraph):
     answer = paragraph[inst[0]:]
     return question, answer
 
+
+
+'''
+（一）新股东以不低于净资产价格收购股权的，企业原盈余积累已全部计入股权交易价格，新股东取得盈余积累转增股本的部分，不征收个人所得税。
+q:关于个人投资者收购企业股权后将原盈余积累转增股本个人所得税问题的公告中新股东以不低于净资产价格收购股权的如何办理
+a:企业原盈余积累已全部计入股权交易价格新股东取得盈余积累转增股本的部分不征收个人所得税。企业原盈余积累已全部计入股权交易价格新股东取得盈余积累转增股本的部分不征收个人所得税。
+'''
+def transform_condition(paragraph):
+    m = re.search('(.*)的，(.*)', paragraph)
+    cond = m.span(1)
+    solu = m.span(2)
+    question = '本公告中' + paragraph[:cond[1]] + '的如何办理'
+    answer = paragraph[solu[0]:]
+    return question, answer
+
+
 def transform_doc(doc):
     doc.qas = []
     transformers = {
         'definition': transform_definition,
         'classification': transform_classification,
         'schedule': transform_schedule,
-        'instruction': transform_instruction
+        'instruction': transform_instruction,
+        'condition': transform_condition
     }
     for type, paragraphs in doc.classified_paragraphs.items():
         if type != 'unknown':
@@ -83,12 +101,11 @@ def transform_doc(doc):
 
 
 def remove_bullet(text):
-    pattern = r'(\s*（.*?）\s*)|(\s*第.+条\s*)|([一二三四五六七八九十]+[\s、]+)'
+    pattern = r'(\s*（.*?）\s*)|(\s*第.+条\s*)|([一二三四五六七八九十]+[\s、]+)|(\d+\.)'
     m = re.search(pattern, text)
     if m is not None:
         span = m.span()
-        if span[0] == 0:
-            return text[span[1]:]
+        return text[:span[0]] + text[span[1]:]
     return text
 
 
@@ -99,7 +116,7 @@ def remove_punction(text):
 
 
 def substitute_pronoun(text, title):
-    refer = ['本规定', '本通知', '本公告', '本条', '本补充公告']
+    refer = ['本规定', '本通知', '本公告', '本办法', '本条', '本补充公告']
     for r in refer:
         if r in text:
             return text.replace(r, title)

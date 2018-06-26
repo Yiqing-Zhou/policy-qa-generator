@@ -17,6 +17,8 @@ def classify_paragraph(paragraph):
         return 'schedule'
     elif re.match('.+在.+时，应.+', paragraph) is not None:
         return 'instruction'
+    elif '的，' in paragraph:
+        return 'condition'
     else:
         return 'unknown'
 
