@@ -60,10 +60,8 @@ a:向主管国税机关提交加盖公章的合同（协议）或相关交易凭
 '''
 def transform_instruction(paragraph):
     m = re.search('(.*)在(.*)时，应(.*)', paragraph)
-    subj = m.span(1)
-    acti = m.span(2)
     inst = m.span(3)
-    question = paragraph[subj[0]:subj[1]] + '怎样' + paragraph[acti[0]:acti[1]]
+    question = paragraph[:inst[0]] + '时应如何'
     answer = paragraph[inst[0]:]
     return question, answer
 
@@ -101,10 +99,10 @@ def remove_punction(text):
 
 
 def substitute_pronoun(text, title):
-    prefix = ['本规定', '本通知', '本公告', '本条', '本补充公告']
-    for p in prefix:
-        if text.startswith(p):
-            return title + text[len(p):]
+    refer = ['本规定', '本通知', '本公告', '本条', '本补充公告']
+    for r in refer:
+        if r in text:
+            return text.replace(r, title)
     return text
 
 
